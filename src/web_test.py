@@ -15,6 +15,10 @@ class WebTestStep(ABC):
         self.driver.get(self.url)
 
     @abstractmethod
+    def post_action(self):
+        return NotImplemented
+
+    @abstractmethod
     def action(self):
         return NotImplemented
 
@@ -41,6 +45,9 @@ class NYCUTestStep(WebTestStep):
 
         print(f'{title}\n{content}')
 
+    def post_action(self):
+        pass
+
     def action(self):
         self.maximize_window()
         self.click_nav_item()
@@ -52,6 +59,9 @@ class GoogleTestStep(WebTestStep):
     def __init__(self):
         url = 'https://www.google.com'
         super().__init__(url)
+
+    def post_action(self):
+        pass
 
     def action(self):
         pass
@@ -70,6 +80,9 @@ class WebTest:
     def load_test_step(self, test_step):
         self.test_step = test_step
         test_step.driver = self.driver
+
+    def do_post_action(self):
+        self.test_step.post_action()
 
     def do_navigate(self):
         self.test_step.navigate()
