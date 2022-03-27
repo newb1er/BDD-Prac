@@ -9,6 +9,7 @@ behave = "*"
 webdriver-manager = "*"
 
 [dev-packages]
+yapf = "*"
 
 [requires]
 python_version = "3.8"
