@@ -1,4 +1,7 @@
+from behave import given, when, then
+from behave.log_capture import capture
 from selenium.webdriver.common.by import By
+import sys
 
 from src.web_test import NYCUTestStep
 
@@ -8,38 +11,59 @@ def step_impl(context):
     print(context.web_test.driver.title)
 
 
-@then('link to NYCU home page')
+@given('test step loaded')
 def step_impl(context):
     context.web_test.load_test_step(NYCUTestStep())
-    context.web_test.do_navigate()
-    context.driver.get('https://www.nycu.edu.tw/')
-
-    assert context.web_test.driver.title == context.driver.title
 
 
-@then('The driver window should be maximized')
+@when('I open the NYCU home page')
 def step_impl(context):
-    context.web_test.do_action()
-    context.driver.maximize_window()
+    context.web_test.do_navigate()
 
-    print(f'web_test_step: {context.web_test.test_step.url}')
-    print(f'web_test: {context.web_test.driver.get_window_size()}')
-    print(f'driver: {context.driver.get_window_size()}')
+
+@then('I should see correct title')
+def step_impl(context):
+    context.web_test.driver.title == context.table[0]['title']
+
+
+@when('I maximize the browser')
+def step_impl(context):
+    context.web_test.test_step.maximize_window()
+
+
+@then('browser should be maximized')
+def step_impl(context):
+    context.driver.maximize_window()
 
     assert context.web_test.driver.get_window_size(
     ) == context.driver.get_window_size()
 
 
-@then('the "消息" nav item should be clicked')
+@when('I click on the nav item')
 def step_impl(context):
-    assert context.web_test.driver.current_url == 'https://www.nycu.edu.tw/news-network/'
+    context.web_test.test_step.click_nav_item()
 
 
-@then('navigate to the first news in the page')
+@then('I should see the correct page')
+def step_impl(context):
+    context.web_test.driver.title == context.table[0]['title']
+
+
+@when('I click on the first news in the page')
+def step_impl(context):
+    origin_stdout = sys.stdout
+    sys.stdout = context.strio
+    context.web_test.test_step.click_first_new()
+    sys.stdout = origin_stdout
+
+
+@capture
+@then('driver should print the title and content')
 def step_impl(context):
     context.driver.get('https://www.nycu.edu.tw/news-network/')
-    list_item = context.driver.find_element(By.ID, '-tab').find_element(
-        By.TAG_NAME, 'li')
-    list_item.find_element(By.TAG_NAME, 'a').click()
+    context.driver.find_element(By.ID, '-tab').find_element(
+        By.TAG_NAME, 'li').find_element(By.TAG_NAME, 'a').click()
+    title = context.driver.find_element(By.CLASS_NAME, 'entry-title').text
+    content = context.driver.find_element(By.CLASS_NAME, 'entry-content').text
 
-    assert context.web_test.driver.current_url == context.driver.current_url
+    assert context.strio.getvalue() == f'{title}\n{content}\n'
