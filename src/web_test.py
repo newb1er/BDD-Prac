@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
 from webdriver_manager.chrome import ChromeDriverManager
 
 
@@ -60,11 +61,27 @@ class GoogleTestStep(WebTestStep):
         url = 'https://www.google.com'
         super().__init__(url)
 
+    def open_tab_and_switch(self):
+        self.driver.switch_to.new_window('tab')
+
+    def input_and_submit(self):
+        self.driver.find_element(By.TAG_NAME,
+                                 'input').send_keys('0811209' + Keys.ENTER)
+        result = self.driver.find_element(By.ID, 'rso')
+        tar_title = result.find_elements(By.CLASS_NAME, 'g')[1].find_element(
+            By.TAG_NAME, 'h3').text
+
+        print(tar_title)
+
+    def close_driver(self):
+        self.driver.quit()
+
     def post_action(self):
-        pass
+        self.open_tab_and_switch()
 
     def action(self):
-        pass
+        self.input_and_submit()
+        self.close_driver()
 
 
 class WebTest:
