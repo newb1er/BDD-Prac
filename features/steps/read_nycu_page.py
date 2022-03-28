@@ -57,7 +57,6 @@ def step_impl(context):
     sys.stdout = origin_stdout
 
 
-@capture
 @then('driver should print the title and content')
 def step_impl(context):
     context.driver.get('https://www.nycu.edu.tw/news-network/')
@@ -67,3 +66,5 @@ def step_impl(context):
     content = context.driver.find_element(By.CLASS_NAME, 'entry-content').text
 
     assert context.strio.getvalue() == f'{title}\n{content}\n'
+
+@
